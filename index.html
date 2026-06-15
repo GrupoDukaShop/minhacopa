@@ -427,7 +427,7 @@ src="https://www.facebook.com/tr?id=4234477643457645&ev=PageView&noscript=1"
     <div class="hero-right">
       <div class="book-stack">
         <div class="book-glow"></div>
-        <img src="capa2.png" alt="Capa do Álbum de Colorir Copa 2026" class="book-cover-img" width="300">
+        <img src="capa2.png" alt="Capa do Álbum de Colorir Copa 2026" class="book-cover-img">
         <div class="bf bf1">🎨 +30 Desenhos!</div>
         <div class="bf bf2">✅ PDF Imprimível</div>
       </div>
@@ -678,17 +678,25 @@ src="https://www.facebook.com/tr?id=4234477643457645&ev=PageView&noscript=1"
 </div>
 
 <script>
-// COUNTDOWN com localStorage
+// COUNTDOWN — reseta automaticamente se expirado
 (function(){
   const KEY='copa26_timer_end';
-  let end=localStorage.getItem(KEY);
-  if(!end){end=Date.now()+29*60*1000+59*1000;localStorage.setItem(KEY,end);}else{end=parseInt(end);}
+  const DURATION=30*60*1000;
+  let end;
+  try{ end=parseInt(localStorage.getItem(KEY)); }catch(e){ end=NaN; }
+  if(!end||isNaN(end)||end<=Date.now()){
+    end=Date.now()+DURATION;
+    try{ localStorage.setItem(KEY,end); }catch(e){}
+  }
   const el=document.getElementById('tmr');
   function tick(){
-    const diff=Math.max(0,end-Date.now());
-    if(diff<=0){el.textContent='00:00';return;}
-    const m=Math.floor(diff/60000).toString().padStart(2,'0');
-    const s=Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+    if(end-Date.now()<=0){
+      end=Date.now()+DURATION;
+      try{ localStorage.setItem(KEY,end); }catch(e){}
+    }
+    const d=Math.max(0,end-Date.now());
+    const m=Math.floor(d/60000).toString().padStart(2,'0');
+    const s=Math.floor((d%60000)/1000).toString().padStart(2,'0');
     el.textContent=m+':'+s;
     setTimeout(tick,500);
   }
